@@ -7,7 +7,7 @@
 
 const VerificationConfig = {
   CLUB_LAT: 0.0,
-  CLUB_LNG: 0.0,
+  CLUB_LNG: 0.0, // SET THESE TO YOUR CLUB'S CENTRE POINT (PREFERRED)
 
   // Distance threshold — how close the user must be (meters)
   MAX_RADIUS_METERS: 100,
