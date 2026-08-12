@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description"
+    content="Sreenidhi Ascend Club — Automated entry & attendance logging system with Wi-Fi and GPS verification." />
+  <meta name="theme-color" content="#2d1b69" />
+  <title>Sreenidhi Ascend</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/png" href="ascend-logo.png" />
+</head>
+
+<body>
+
+  <!-- ═══════════ BACKGROUND ═══════════ -->
+  <div id="dot-field-bg" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;"></div>
+
+  <!-- ═══════════ TOAST CONTAINER ═══════════ -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ═══════════ HEADER / BRANDING ═══════════ -->
+  <header class="header">
+    <div class="header__brand">
+      <div class="header__logo">
+        <img src="ascend-logo.png" alt="Ascend Logo"
+          style="width: 100%; height: 100%; object-fit: contain; border-radius: 14px;" />
+      </div>
+      <h1 class="header__title">Sreenidhi Ascend</h1>
+    </div>
+    <p class="header__subtitle">ATTENDANCE LOGGER</p>
+  </header>
+
+  <!-- ═══════════ ACCENT STRIP ═══════════ -->
+  <div class="accent-strip"></div>
+
+  <!-- ═══════════ MAIN CARD ═══════════ -->
+  <main class="card" id="main-card">
+
+    <!-- Status Indicator -->
+    <div class="status-bar" id="status-bar">
+      <span class="status-dot"></span>
+      <span id="status-text">Not Checked In</span>
+    </div>
+
+    <!-- Form Fields -->
+    <div class="form-group">
+      <label for="input-name">Full Name</label>
+      <input type="text" id="input-name" class="form-input" placeholder="e.g. Rahul Sharma" autocomplete="name" />
+    </div>
+
+    <div class="form-group">
+      <label for="input-branch">Branch / Department</label>
+      <div class="select-wrapper">
+        <select id="input-branch" class="form-select">
+          <option value="" disabled selected hidden>Select Branch</option>
+          <option value="CSE">CSE</option>
+          <option value="AIML">AIML</option>
+          <option value="IT">IT</option>
+          <option value="DS">DS</option>
+          <option value="CS">CS</option>
+          <option value="ECE">ECE</option>
+          <option value="EEE">EEE</option>
+          <option value="ME">ME</option>
+          <option value="CIVIL">CIVIL</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="input-roll">Roll Number</label>
+      <input type="text" id="input-roll" class="form-input" placeholder="e.g. 21B91A0501" autocomplete="off" />
+    </div>
+
+    <div class="form-group">
+      <label for="input-phone">Phone Number</label>
+      <input type="tel" id="input-phone" class="form-input" placeholder="10-digit mobile number" maxlength="10"
+        inputmode="numeric" pattern="[0-9]{10}" autocomplete="tel" />
+    </div>
+
+    <div class="form-group">
+      <label for="input-role">Club Role</label>
+      <div class="select-wrapper">
+        <select id="input-role" class="form-select">
+          <option value="Advisory Board">Advisory Board</option>
+          <option value="Operation Lead">Operation Lead</option>
+          <option value="IIC">IIC</option>
+          <option value="Hardware Lead">Hardware Lead</option>
+          <option value="Software Lead">Software Lead</option>
+          <option value="Branding & Media">Branding & Media Lead</option>
+          <option value="Startup & Incubation">Startup & Incubation Lead</option>
+          <option value="Research & Development">Research & Development Lead</option>
+          <option value="Expo & Initiative">Expo & Initiative Lead</option>
+          <option value="Community Lead">Community Lead</option>
+          <option value="Campus Outreach Lead">Campus Outreach Lead</option>
+          <option value="Member">Member</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="input-purpose">Purpose / Notes</label>
+      <input type="text" id="input-purpose" class="form-input" placeholder="e.g. Smart India Hackathon"
+        autocomplete="off" />
+    </div>
+
+    <!-- Action Button -->
+    <div class="btn-row btn-row--center">
+      <button type="button" id="btn-checkin" class="btn btn--checkin">
+        Check-In
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ═══════════ ACTIVE SESSION VIEW ═══════════ -->
+  <section class="card active-session" id="active-session" style="display: none;">
+    <div class="session-info">
+      <div class="session-info__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <p class="session-info__label">Checked in at</p>
+      <p class="session-info__time" id="checkin-time-display">--:-- --</p>
+    </div>
+
+    <div class="session-countdown">
+      <p class="session-countdown__timer" id="countdown-timer">00:00:00</p>
+      <p class="session-countdown__label" id="countdown-label">(Auto check-out in this time)</p>
+    </div>
+
+    <div class="btn-row btn-row--center">
+      <button type="button" id="btn-checkout" class="btn btn--checkout">
+        Check-Out
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══════════ CHECK-IN SUCCESS POPUP ═══════════ -->
+  <div class="modal-overlay" id="success-overlay">
+    <div class="modal success-popup">
+      <div class="success-popup__checkmark">
+        <svg class="checkmark-svg" viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+      <h2 class="success-popup__title">You've Checked In!</h2>
+      <p class="success-popup__desc">Your attendance has been logged successfully.</p>
+      <button type="button" id="success-okay-btn" class="btn btn--checkin success-popup__btn">Okay</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="footer">
+    Sreenidhi Ascend &copy; 2026
+  </footer>
+
+  <!-- ═══════════ MANUAL CHECK-OUT MODAL ═══════════ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" role="dialog" aria-labelledby="modal-title">
+      <h2 class="modal__title" id="modal-title">Manual Entry Time</h2>
+      <p class="modal__desc">
+        You haven't checked in today.<br />
+        Please select what time you entered the club room:
+      </p>
+      <input type="time" id="modal-time" class="modal__time-input" />
+      <div class="modal__actions">
+        <button type="button" id="modal-cancel" class="modal__btn modal__btn--cancel">Cancel</button>
+        <button type="button" id="modal-confirm" class="modal__btn modal__btn--confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCRIPTS ═══════════ -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_FIREBASE_API_KEY",
+      authDomain: "ascend-attendance-logger.firebaseapp.com",
+      projectId: "ascend-attendance-logger",
+      storageBucket: "ascend-attendance-logger.firebasestorage.app",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+  <script src="borderglow.js"></script>
+  <script src="dotfield.js"></script>
+  <script src="verification.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const bgContainer = document.getElementById('dot-field-bg');
+      if (bgContainer) {
+        new DotField(bgContainer, {
+          dotRadius: 1.5,
+          dotSpacing: 14,
+          bulgeStrength: 67,
+          glowRadius: 160,
+          sparkle: false,
+          waveAmplitude: 0,
+          // Colors matched to Sreenidhi Ascend Palette
+          gradientFrom: 'rgba(45, 27, 105, 0.75)', // --ascend-navy (darker)
+          gradientTo: 'rgba(0, 145, 234, 0.65)',   // --ascend-blue (darker)
+          glowColor: 'rgba(216, 27, 96, 0.15)'     // --ascend-magenta slightly more visible glow
+        });
+      }
+
+      // Initialize BorderGlow on input fields
+      const inputs = document.querySelectorAll('.form-input, .form-select');
+      inputs.forEach(input => {
+        new BorderGlow(input, {
+          className: 'glow-wrap-input',
+          backgroundColor: 'var(--clay-bg)', // match input background
+          glowColor: '260 70 60', // Ascend Navy-ish glow
+          borderRadius: 16,
+          colors: ['#2d1b69', '#d81b60', '#0091ea'],
+          glowRadius: 15,
+          edgeSensitivity: 20
+        });
+      });
+
+      // Initialize BorderGlow on Check-in button
+      const checkinBtn = document.getElementById('btn-checkin');
+      if (checkinBtn) {
+        new BorderGlow(checkinBtn, {
+          className: 'glow-wrap-btn',
+          backgroundColor: 'transparent',
+          glowColor: '200 100 50', // Ascend Blue-ish glow
+          borderRadius: 18,
+          colors: ['#0091ea', '#00b0ff', '#ffffff'],
+          glowRadius: 20
+        });
+      }
+
+      // Initialize BorderGlow on Check-out button
+      const checkoutBtn = document.getElementById('btn-checkout');
+      if (checkoutBtn) {
+        new BorderGlow(checkoutBtn, {
+          className: 'glow-wrap-btn',
+          backgroundColor: 'transparent',
+          glowColor: '340 90 60', // Ascend Magenta/Coral-ish glow
+          borderRadius: 18,
+          colors: ['#f0533c', '#d81b60', '#ffffff'],
+          glowRadius: 20
+        });
+      }
+    });
+  </script>
+
+</body>
+
+</html>
