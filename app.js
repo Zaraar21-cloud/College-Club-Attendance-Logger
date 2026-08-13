@@ -11,7 +11,7 @@
 
 const AppConfig = {
   // TODO: Replace with your deployed Google Apps Script Web App URL
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
+  APPS_SCRIPT_URL: '',
 
   // LocalStorage keys
   LS_KEYS: {
