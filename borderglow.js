@@ -55,7 +55,7 @@ function animateValue({ start = 0, end = 100, duration = 1000, delay = 0, ease =
 class BorderGlow {
   constructor(element, options = {}) {
     this.element = element;
-    
+
     this.options = {
       className: '',
       edgeSensitivity: 30,
@@ -70,30 +70,30 @@ class BorderGlow {
       fillOpacity: 0.5,
       ...options
     };
-    
+
     this.init();
   }
-  
+
   init() {
     this.wrapper = document.createElement('div');
     this.wrapper.className = 'border-glow-card ' + this.options.className;
-    
+
     this.edgeLight = document.createElement('span');
     this.edgeLight.className = 'edge-light';
-    
+
     this.inner = document.createElement('div');
     this.inner.className = 'border-glow-inner';
-    
+
     this.element.parentNode.insertBefore(this.wrapper, this.element);
     this.inner.appendChild(this.element);
     this.wrapper.appendChild(this.edgeLight);
     this.wrapper.appendChild(this.inner);
-    
+
     this.applyStyles();
-    
+
     this.handlePointerMove = this.handlePointerMove.bind(this);
     window.addEventListener('pointermove', this.handlePointerMove);
-    
+
     this.isFocused = false;
     this.element.addEventListener('focus', () => {
       this.isFocused = true;
@@ -102,12 +102,12 @@ class BorderGlow {
     this.element.addEventListener('blur', () => {
       this.isFocused = false;
     });
-    
+
     if (this.options.animated) {
       this.playAnimation();
     }
   }
-  
+
   applyStyles() {
     const vars = {
       '--card-bg': this.options.backgroundColor,
@@ -119,17 +119,17 @@ class BorderGlow {
       ...buildGlowVars(this.options.glowColor, this.options.glowIntensity),
       ...buildGradientVars(this.options.colors)
     };
-    
+
     for (const [key, value] of Object.entries(vars)) {
       this.wrapper.style.setProperty(key, value);
     }
   }
-  
+
   getCenterOfElement(el) {
     const rect = el.getBoundingClientRect();
     return [rect.width / 2, rect.height / 2];
   }
-  
+
   getEdgeProximity(el, x, y) {
     const [cx, cy] = this.getCenterOfElement(el);
     const dx = x - cx;
@@ -140,7 +140,7 @@ class BorderGlow {
     if (dy !== 0) ky = cy / Math.abs(dy);
     return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
   }
-  
+
   getCursorAngle(el, x, y) {
     const [cx, cy] = this.getCenterOfElement(el);
     const dx = x - cx;
@@ -151,23 +151,23 @@ class BorderGlow {
     if (degrees < 0) degrees += 360;
     return degrees;
   }
-  
+
   handlePointerMove(e) {
     const rect = this.wrapper.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     let edge = this.getEdgeProximity(this.wrapper, x, y);
     const isInside = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
     if (isInside || this.isFocused) {
       edge = 1; // Full glow when inside or focused!
     }
     const angle = this.getCursorAngle(this.wrapper, x, y);
-    
+
     this.wrapper.style.setProperty('--edge-proximity', `${(edge * 100).toFixed(3)}`);
     this.wrapper.style.setProperty('--cursor-angle', `${angle.toFixed(3)}deg`);
   }
-  
+
   playAnimation() {
     const card = this.wrapper;
     const angleStart = 110;
@@ -176,13 +176,18 @@ class BorderGlow {
     card.style.setProperty('--cursor-angle', `${angleStart}deg`);
 
     animateValue({ duration: 500, onUpdate: v => card.style.setProperty('--edge-proximity', v) });
-    animateValue({ ease: easeInCubic, duration: 1500, end: 50, onUpdate: v => {
-      card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
-    }});
-    animateValue({ ease: easeOutCubic, delay: 1500, duration: 2250, start: 50, end: 100, onUpdate: v => {
-      card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
-    }});
-    animateValue({ ease: easeInCubic, delay: 2500, duration: 1500, start: 100, end: 0,
+    animateValue({
+      ease: easeInCubic, duration: 1500, end: 50, onUpdate: v => {
+        card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+      }
+    });
+    animateValue({
+      ease: easeOutCubic, delay: 1500, duration: 2250, start: 50, end: 100, onUpdate: v => {
+        card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+      }
+    });
+    animateValue({
+      ease: easeInCubic, delay: 2500, duration: 1500, start: 100, end: 0,
       onUpdate: v => card.style.setProperty('--edge-proximity', v),
       onEnd: () => card.classList.remove('sweep-active'),
     });

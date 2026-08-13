@@ -10,7 +10,7 @@ const VerificationConfig = {
   CLUB_LNG: 0.0,
 
   // Distance threshold — how close the user must be (meters)
-  MAX_RADIUS_METERS: 100,
+  MAX_RADIUS_METERS: 30,
 
   // Total time budget for the GPS warmup + reading cycle (ms)
   GPS_TIMEOUT_MS: 15000,
