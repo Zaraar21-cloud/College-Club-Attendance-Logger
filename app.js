@@ -10,8 +10,9 @@
 // ──────────────────────────────────────────────────────────────
 
 const AppConfig = {
-  // TODO: Replace with your deployed Google Apps Script Web App URL
-  APPS_SCRIPT_URL: '',
+  // Deployed Google Apps Script Web App URL.
+  // Set in config.js (git-ignored — see config.example.js).
+  APPS_SCRIPT_URL: (window.AppSecrets && window.AppSecrets.appsScriptUrl) || '',
 
   // LocalStorage keys
   LS_KEYS: {
@@ -585,8 +586,8 @@ function buildPayload(action, verificationMethod, purpose) {
 
 async function submitAttendance(payload) {
   try {
-    if (!AppConfig.APPS_SCRIPT_URL || AppConfig.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL' || AppConfig.APPS_SCRIPT_URL === '') {
-      showToast('⚠ Apps Script URL not configured. Check app.js', 'warning');
+    if (!AppConfig.APPS_SCRIPT_URL) {
+      showToast('⚠ Apps Script URL not configured. Check config.js', 'warning');
       console.warn('[Ascend] Apps Script URL placeholder — payload:', payload);
       // Return true for testing UI flow without backend
       return true;

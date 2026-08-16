@@ -1,7 +1,19 @@
-node_modules/
+# Local deployment configuration — Firebase keys, club coordinates,
+# Apps Script endpoint. Never commit this. See config.example.js.
+config.js
+
+# Firebase CLI
 .firebase/
 .firebaserc
 firebase.json
+
+# Dependencies
+node_modules/
+
+# Environment
 .env
+.env.local
+
+# OS cruft
 .DS_Store
 Thumbs.db

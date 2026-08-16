@@ -118,9 +118,10 @@
   <section class="card active-session" id="active-session" style="display: none;">
     <div class="session-info">
       <div class="session-info__icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
         </svg>
       </div>
       <p class="session-info__label">Checked in at</p>
@@ -144,8 +145,8 @@
     <div class="modal success-popup">
       <div class="success-popup__checkmark">
         <svg class="checkmark-svg" viewBox="0 0 52 52">
-          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
         </svg>
       </div>
       <h2 class="success-popup__title">You've Checked In!</h2>
@@ -178,17 +179,16 @@
   <!-- ═══════════ SCRIPTS ═══════════ -->
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+
+  <!-- Deployment config: git-ignored. Copy config.example.js to config.js. -->
+  <script src="config.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_FIREBASE_API_KEY",
-      authDomain: "ascend-attendance-logger.firebaseapp.com",
-      projectId: "ascend-attendance-logger",
-      storageBucket: "ascend-attendance-logger.firebasestorage.app",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "YOUR_MEASUREMENT_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
+    if (!window.AppSecrets) {
+      throw new Error(
+        'config.js is missing. Copy config.example.js to config.js and fill in your deployment values.'
+      );
+    }
+    firebase.initializeApp(window.AppSecrets.firebase);
     const db = firebase.firestore();
   </script>
   <script src="borderglow.js"></script>

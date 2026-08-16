@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// ============================================================
+//  Sreenidhi Ascend — Firestore Security Rules
+// ============================================================
+//  The attendance logger has no sign-in step: members open the
+//  page and check in. That means these rules are the ONLY thing
+//  standing between the database and the public internet, and
+//  they cannot verify *who* is writing — only *what* is written.
+//
+//  So the goal here is damage limitation, not authentication:
+//    * only the `active_sessions` collection is reachable at all
+//    * documents must match the exact shape the client writes
+//    * field lengths are capped so the collection cannot be used
+//      as free storage
+//    * `update` is denied outright — a session is created on
+//      check-in and deleted on check-out, never edited
+//
+//  If this club ever needs real guarantees about who checked in,
+//  the fix is Firebase Anonymous or Google auth plus an
+//  `request.auth.uid` ownership check on each document — not
+//  stricter shape validation.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /active_sessions/{sessionId} {
+
+      // The client lists open sessions to run auto-checkout sweeps.
+      allow read: if true;
+
+      allow create: if isWellFormedSession(request.resource.data);
+
+      // Check-out deletes the session document.
+      allow delete: if true;
+
+      // Sessions are immutable once written.
+      allow update: if false;
+    }
+
+    // Everything outside active_sessions is unreachable from the client.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+
+  function isWellFormedSession(data) {
+    return data.keys().hasOnly(['name', 'branch', 'rollNumber', 'phone', 'role', 'clientTime', 'timestamp'])
+      && data.keys().hasAll(['name', 'rollNumber', 'clientTime', 'timestamp'])
+      && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+      && data.branch is string && data.branch.size() <= 20
+      && data.rollNumber is string && data.rollNumber.size() > 0 && data.rollNumber.size() <= 20
+      && data.phone is string && data.phone.size() <= 15
+      && data.role is string && data.role.size() <= 50
+      && data.clientTime is int
+      && data.timestamp == request.time;
+  }
+}

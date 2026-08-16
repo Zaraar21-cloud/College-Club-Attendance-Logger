@@ -5,12 +5,15 @@
    A transaction is approved if GPS verification succeeds.
    ============================================================ */
 
+// Club-specific values live in config.js (git-ignored — see config.example.js)
+const ClubLocation = (window.AppSecrets && window.AppSecrets.club) || {};
+
 const VerificationConfig = {
-  CLUB_LAT: 0.0,
-  CLUB_LNG: 0.0,
+  CLUB_LAT: ClubLocation.lat,
+  CLUB_LNG: ClubLocation.lng,
 
   // Distance threshold — how close the user must be (meters)
-  MAX_RADIUS_METERS: 30,
+  MAX_RADIUS_METERS: ClubLocation.radiusMeters || 30,
 
   // Total time budget for the GPS warmup + reading cycle (ms)
   GPS_TIMEOUT_MS: 15000,
@@ -85,6 +88,18 @@ function checkGPSLocation() {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
       resolve({ success: false, distance: null, accuracy: null, error: 'Geolocation not supported by this browser.' });
+      return;
+    }
+
+    // Fail loudly on an unconfigured clone rather than silently comparing
+    // against undefined coordinates and reporting a nonsensical distance.
+    if (typeof VerificationConfig.CLUB_LAT !== 'number' || typeof VerificationConfig.CLUB_LNG !== 'number') {
+      resolve({
+        success: false,
+        distance: null,
+        accuracy: null,
+        error: 'Club coordinates are not configured. Set club.lat and club.lng in config.js.',
+      });
       return;
     }
 
